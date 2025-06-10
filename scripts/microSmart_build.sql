@@ -1,3 +1,6 @@
+USE microSmart;
+
+--Información del micronegocio
 CREATE TABLE [Locales] (
   [id_Local] int PRIMARY KEY,
   [nombreLocal] nvarchar(25),
@@ -14,6 +17,8 @@ CREATE TABLE [Horarios] (
 )
 GO
 
+--Herramientas
+--Para productos
 CREATE TABLE [Productos] (
   [id_Producto] int PRIMARY KEY,
   [id_Local] int,
@@ -39,7 +44,7 @@ CREATE TABLE [Mediciones] (
   [abreviaturaMedicion] nvarchar(10)
 )
 GO
-
+--Para almacen
 CREATE TABLE [RegistroInventarios] (
   [id_RegInv] int PRIMARY KEY,
   [id_Productos] int,
@@ -56,14 +61,14 @@ CREATE TABLE [TiposMovimientos] (
   [tipoMovimiento] nvarchar(20)
 )
 GO
-
+--Para ventas
 CREATE TABLE [Tickets] (
   [id_Ticket] int PRIMARY KEY,
   [id_Local] int,
   [id_MetodoPago] int,
   [id_Estatus] int,
   [fechaVenta] datetime,
-  [totalVenta] float
+  [totalVenta] decimal (10,2)
 )
 GO
 
