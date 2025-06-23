@@ -1,135 +1,137 @@
-USE microSmart;
+-- Para el Sistema
+CREATE TABLE CP (
+  id_cp char(5) PRIMARY KEY,
+  colonia nvarchar(50),
+  delegacion nvarchar(50),
+  estado nvarchar(50)
+);
 
---Información del micronegocio
-CREATE TABLE [Locales] (
-  [id_Local] int PRIMARY KEY,
-  [nombreLocal] nvarchar(25),
-  [direccion] nvarchar(40),
-  [id_Horario] int
-)
-GO
+CREATE TABLE TipoMovimiento (
+  id_tipo_mov int PRIMARY KEY,
+  nombre_tipo nvarchar(20)
+);
 
-CREATE TABLE [Horarios] (
-  [id_Horario] int PRIMARY KEY,
-  [diaSemana] nvarchar(25),
-  [horarioAbierto] time,
-  [horarioCerrado] time
-)
-GO
+CREATE TABLE EstadoVenta (
+  id_estado_venta int PRIMARY KEY,
+  nombre_estado nvarchar(20)
+);
 
---Herramientas
---Para productos
-CREATE TABLE [Productos] (
-  [id_Producto] int PRIMARY KEY,
-  [id_Local] int,
-  [id_Categoria] int,
-  [nombreProducto] nvarchar(30),
-  [descripcionProducto] text,
-  [precioProducto] decimal(10,2),
-  [stockActual] float,
-  [id_Medicion] int,
-  [activoProducto] bit
-)
-GO
+-- Para el Local
+CREATE TABLE Local (
+  id_local int PRIMARY KEY,
+  nombre nvarchar(25),
+  id_direccion int
+);
 
-CREATE TABLE [Categorias] (
-  [id_Categoria] int PRIMARY KEY,
-  [nombreCategoria] nvarchar(25)
-)
-GO
+CREATE TABLE Direccion (
+  id_direccion int PRIMARY KEY,
+  num_casa_ext int,
+  num_casa_int int,
+  nombre_casa nvarchar(25),
+  id_cp char(5)
+);
 
-CREATE TABLE [Mediciones] (
-  [id_Medicion] int PRIMARY KEY,
-  [nombreMedicion] nvarchar(25),
-  [abreviaturaMedicion] nvarchar(10)
-)
-GO
---Para almacen
-CREATE TABLE [RegistroInventarios] (
-  [id_RegInv] int PRIMARY KEY,
-  [id_Productos] int,
-  [fechaMovimiento] datetime,
-  [id_TipoMov] int,
-  [cantidadAfectada] float,
-  [id_Medicion] int,
-  [razonMovimiento] text
-)
-GO
+ALTER TABLE Local ADD CONSTRAINT FK_Local_Direccion FOREIGN KEY (id_direccion) REFERENCES Direccion(id_direccion);
+ALTER TABLE Direccion ADD CONSTRAINT FK_Direccion_CP FOREIGN KEY (id_cp) REFERENCES CP(id_cp);
 
-CREATE TABLE [TiposMovimientos] (
-  [id_TipoMov] int PRIMARY KEY,
-  [tipoMovimiento] nvarchar(20)
-)
-GO
---Para ventas
-CREATE TABLE [Tickets] (
-  [id_Ticket] int PRIMARY KEY,
-  [id_Local] int,
-  [id_MetodoPago] int,
-  [id_Estatus] int,
-  [fechaVenta] datetime,
-  [totalVenta] decimal (10,2)
-)
-GO
+CREATE TABLE Horario (
+  id_horario int PRIMARY KEY,
+  id_local int,
+  horario_abierto time,
+  horario_cerrado time
+);
+ALTER TABLE Horario ADD CONSTRAINT FK_Horario_Local FOREIGN KEY (id_local) REFERENCES Local(id_local);
 
-CREATE TABLE [Ventas] (
-  [id_Venta] int PRIMARY KEY,
-  [id_Ticket] int,
-  [id_Producto] int,
-  [cantidadVendida] float,
-  [precioUnitario] float,
-  [id_Medicion] int,
-  [subtotal] decimal(10,2)
-)
-GO
+-- Para el Almacen
+CREATE TABLE Inventario (
+  id_inventario int PRIMARY KEY,
+  fecha_creacion datetime
+);
 
-CREATE TABLE [EstadosVentas] (
-  [id_EstadoVenta] int PRIMARY KEY,
-  [estatus] nvarchar(20)
-)
-GO
+CREATE TABLE Producto (
+  id_producto int PRIMARY KEY,
+  nombre nvarchar(30),
+  descripcion text,
+  precio decimal(10,2),
+  stock float,
+  id_medicion int,
+  activo_producto bit
+);
 
-CREATE TABLE [MetodosPagos] (
-  [id_MetodoPago] int PRIMARY KEY,
-  [tipoPago] nvarchar(20)
-)
-GO
+CREATE TABLE Medicion (
+  id_medicion int PRIMARY KEY,
+  nombre_medicion nvarchar(25),
+  abreviatura nvarchar(10)
+);
+ALTER TABLE Producto ADD CONSTRAINT FK_Producto_Medicion FOREIGN KEY (id_medicion) REFERENCES Medicion(id_medicion);
 
-ALTER TABLE [Locales] ADD FOREIGN KEY ([id_Horario]) REFERENCES [Horarios] ([id_Horario])
-GO
+CREATE TABLE ProductoLocal (
+  id_producto int,
+  id_local int,
+  PRIMARY KEY (id_producto, id_local)
+);
+ALTER TABLE ProductoLocal ADD CONSTRAINT FK_ProductoLocal_Producto FOREIGN KEY (id_producto) REFERENCES Producto(id_producto);
+ALTER TABLE ProductoLocal ADD CONSTRAINT FK_ProductoLocal_Local FOREIGN KEY (id_local) REFERENCES Local(id_local);
 
-ALTER TABLE [Productos] ADD FOREIGN KEY ([id_Local]) REFERENCES [Locales] ([id_Local])
-GO
+CREATE TABLE Categoria (
+  id_categoria int PRIMARY KEY,
+  nombre_categoria nvarchar(25)
+);
 
-ALTER TABLE [Productos] ADD FOREIGN KEY ([id_Categoria]) REFERENCES [Categorias] ([id_Categoria])
-GO
+CREATE TABLE ProductoCategoria (
+  id_producto int,
+  id_categoria int,
+  PRIMARY KEY (id_producto, id_categoria)
+);
+ALTER TABLE ProductoCategoria ADD CONSTRAINT FK_ProductoCategoria_Producto FOREIGN KEY (id_producto) REFERENCES Producto(id_producto);
+ALTER TABLE ProductoCategoria ADD CONSTRAINT FK_ProductoCategoria_Categoria FOREIGN KEY (id_categoria) REFERENCES Categoria(id_categoria);
 
-ALTER TABLE [Productos] ADD FOREIGN KEY ([id_Medicion]) REFERENCES [Mediciones] ([id_Medicion])
-GO
+CREATE TABLE MovimientoInventario (
+  id_movimiento int PRIMARY KEY,
+  id_inventario int,
+  id_producto int,
+  fecha_movimiento datetime,
+  id_tipo_mov int,
+  cantidad_afectada float,
+  razon_movimiento text
+);
+ALTER TABLE MovimientoInventario ADD CONSTRAINT FK_MovInv_Inventario FOREIGN KEY (id_inventario) REFERENCES Inventario(id_inventario);
+ALTER TABLE MovimientoInventario ADD CONSTRAINT FK_MovInv_Producto FOREIGN KEY (id_producto) REFERENCES Producto(id_producto);
+ALTER TABLE MovimientoInventario ADD CONSTRAINT FK_MovInv_TipoMov FOREIGN KEY (id_tipo_mov) REFERENCES TipoMovimiento(id_tipo_mov);
 
-ALTER TABLE [RegistroInventarios] ADD FOREIGN KEY ([id_Productos]) REFERENCES [Productos] ([id_Producto])
-GO
+-- Para la Venta
+CREATE TABLE Ticket (
+  id_ticket int PRIMARY KEY,
+  id_local int,
+  id_metodo_pago int,
+  id_estado_venta int,
+  fecha_venta datetime,
+  total_venta float
+);
+ALTER TABLE Ticket ADD CONSTRAINT FK_Ticket_Local FOREIGN KEY (id_local) REFERENCES Local(id_local);
+ALTER TABLE Ticket ADD CONSTRAINT FK_Ticket_MetodoPago FOREIGN KEY (id_metodo_pago) REFERENCES MetodoPago(id_metodo_pago);
+ALTER TABLE Ticket ADD CONSTRAINT FK_Ticket_EstadoVenta FOREIGN KEY (id_estado_venta) REFERENCES EstadoVenta(id_estado_venta);
 
-ALTER TABLE [RegistroInventarios] ADD FOREIGN KEY ([id_TipoMov]) REFERENCES [TiposMovimientos] ([id_TipoMov])
-GO
+CREATE TABLE MetodoPago (
+  id_metodo_pago int PRIMARY KEY,
+  nombre_tipo nvarchar(20)
+);
 
-ALTER TABLE [RegistroInventarios] ADD FOREIGN KEY ([id_Medicion]) REFERENCES [Mediciones] ([id_Medicion])
-GO
+CREATE TABLE Venta (
+  id_venta int PRIMARY KEY,
+  id_ticket int,
+  subtotal decimal(10,2)
+);
+ALTER TABLE Venta ADD CONSTRAINT FK_Venta_Ticket FOREIGN KEY (id_ticket) REFERENCES Ticket(id_ticket);
 
-ALTER TABLE [Tickets] ADD FOREIGN KEY ([id_Local]) REFERENCES [Locales] ([id_Local])
-GO
-
-ALTER TABLE [Tickets] ADD FOREIGN KEY ([id_MetodoPago]) REFERENCES [MetodosPagos] ([id_MetodoPago])
-GO
-
-ALTER TABLE [Tickets] ADD FOREIGN KEY ([id_Estatus]) REFERENCES [EstadosVentas] ([id_EstadoVenta])
-GO
-
-ALTER TABLE [Ventas] ADD FOREIGN KEY ([id_Ticket]) REFERENCES [Tickets] ([id_Ticket])
-GO
-
-ALTER TABLE [Ventas] ADD FOREIGN KEY ([id_Producto]) REFERENCES [Productos] ([id_Producto])
-GO
-
-ALTER TABLE [Ventas] ADD FOREIGN KEY ([id_Medicion]) REFERENCES [Mediciones] ([id_Medicion])
-GO
+CREATE TABLE VentaProducto (
+  id_venta int,
+  id_producto int,
+  cantidad_vendida float,
+  precio_unitario float,
+  id_medicion int,
+  PRIMARY KEY (id_venta, id_producto)
+);
+ALTER TABLE VentaProducto ADD CONSTRAINT FK_VentaProducto_Venta FOREIGN KEY (id_venta) REFERENCES Venta(id_venta);
+ALTER TABLE VentaProducto ADD CONSTRAINT FK_VentaProducto_Producto FOREIGN KEY (id_producto) REFERENCES Producto(id_producto);
+ALTER TABLE VentaProducto ADD CONSTRAINT FK_VentaProducto_Medicion FOREIGN KEY (id_medicion) REFERENCES Medicion(id_medicion);
