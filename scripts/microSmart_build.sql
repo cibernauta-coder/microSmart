@@ -16,6 +16,26 @@ CREATE TABLE EstadoVenta (
   nombre_estado nvarchar(20)
 );
 
+CREATE TABLE Medicion (
+  id_medicion int PRIMARY KEY,
+  nombre_medicion nvarchar(25),
+  abreviatura nvarchar(10)
+);
+ALTER TABLE Producto ADD CONSTRAINT FK_Producto_Medicion FOREIGN KEY (id_medicion) REFERENCES Medicion(id_medicion);
+
+CREATE TABLE ProductoCategoria (
+  id_producto int,
+  id_categoria int,
+  PRIMARY KEY (id_producto, id_categoria)
+);
+ALTER TABLE ProductoCategoria ADD CONSTRAINT FK_ProductoCategoria_Producto FOREIGN KEY (id_producto) REFERENCES Producto(id_producto);
+ALTER TABLE ProductoCategoria ADD CONSTRAINT FK_ProductoCategoria_Categoria FOREIGN KEY (id_categoria) REFERENCES Categoria(id_categoria);
+
+CREATE TABLE MetodoPago (
+  id_metodo_pago int PRIMARY KEY,
+  nombre_tipo nvarchar(20)
+);
+
 -- Para el Local
 CREATE TABLE Local (
   id_local int PRIMARY KEY,
@@ -58,13 +78,6 @@ CREATE TABLE Producto (
   activo_producto bit
 );
 
-CREATE TABLE Medicion (
-  id_medicion int PRIMARY KEY,
-  nombre_medicion nvarchar(25),
-  abreviatura nvarchar(10)
-);
-ALTER TABLE Producto ADD CONSTRAINT FK_Producto_Medicion FOREIGN KEY (id_medicion) REFERENCES Medicion(id_medicion);
-
 CREATE TABLE ProductoLocal (
   id_producto int,
   id_local int,
@@ -77,14 +90,6 @@ CREATE TABLE Categoria (
   id_categoria int PRIMARY KEY,
   nombre_categoria nvarchar(25)
 );
-
-CREATE TABLE ProductoCategoria (
-  id_producto int,
-  id_categoria int,
-  PRIMARY KEY (id_producto, id_categoria)
-);
-ALTER TABLE ProductoCategoria ADD CONSTRAINT FK_ProductoCategoria_Producto FOREIGN KEY (id_producto) REFERENCES Producto(id_producto);
-ALTER TABLE ProductoCategoria ADD CONSTRAINT FK_ProductoCategoria_Categoria FOREIGN KEY (id_categoria) REFERENCES Categoria(id_categoria);
 
 CREATE TABLE MovimientoInventario (
   id_movimiento int PRIMARY KEY,
@@ -111,11 +116,6 @@ CREATE TABLE Ticket (
 ALTER TABLE Ticket ADD CONSTRAINT FK_Ticket_Local FOREIGN KEY (id_local) REFERENCES Local(id_local);
 ALTER TABLE Ticket ADD CONSTRAINT FK_Ticket_MetodoPago FOREIGN KEY (id_metodo_pago) REFERENCES MetodoPago(id_metodo_pago);
 ALTER TABLE Ticket ADD CONSTRAINT FK_Ticket_EstadoVenta FOREIGN KEY (id_estado_venta) REFERENCES EstadoVenta(id_estado_venta);
-
-CREATE TABLE MetodoPago (
-  id_metodo_pago int PRIMARY KEY,
-  nombre_tipo nvarchar(20)
-);
 
 CREATE TABLE Venta (
   id_venta int PRIMARY KEY,
