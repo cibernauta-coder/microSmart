@@ -1,5 +1,8 @@
 -- Consultas simples y multitabla para Movimientos
 
+-- =====================
+-- CONSULTAS SENCILLAS
+-- =====================
 -- 1. Listar todos los movimientos
 SELECT * FROM Movimientos;
 
@@ -18,6 +21,9 @@ SELECT * FROM Movimientos WHERE fecha BETWEEN '2024-01-01' AND '2024-12-31';
 -- 6. Contar movimientos por producto
 SELECT producto_id, COUNT(*) AS total FROM Movimientos GROUP BY producto_id;
 
+-- =====================
+-- CONSULTAS MULTITABLA
+-- =====================
 -- 7. Listar productos con más movimientos
 SELECT producto_id, COUNT(*) AS total_movimientos
 FROM Movimientos
@@ -25,7 +31,7 @@ GROUP BY producto_id
 ORDER BY total_movimientos DESC;
 
 -- 8. Listar movimientos recientes
-SELECT * FROM Movimientos WHERE fecha > DATE_SUB(NOW(), INTERVAL 7 DAY);
+SELECT * FROM Movimientos WHERE fecha > DATEADD(DAY, -7, GETDATE());
 
 -- 9. Listar movimientos y productos
 SELECT m.id, m.cantidad, m.tipo, m.fecha, p.nombre AS producto
@@ -50,7 +56,7 @@ SELECT * FROM Movimientos WHERE tipo = 'entrada';
 SELECT * FROM Movimientos WHERE tipo = 'salida';
 
 -- 14. Obtener último movimiento de un producto
-SELECT * FROM Movimientos WHERE producto_id = 1 ORDER BY fecha DESC LIMIT 1;
+SELECT TOP 1 * FROM Movimientos WHERE producto_id = 1 ORDER BY fecha DESC;
 
 -- 15. Listar movimientos por usuario (si aplica)
 SELECT * FROM Movimientos WHERE usuario_id = 1;

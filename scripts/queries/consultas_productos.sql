@@ -1,5 +1,8 @@
 -- Consultas simples y multitabla para Productos
 
+-- =====================
+-- CONSULTAS SENCILLAS
+-- =====================
 -- 1. Listar todos los productos activos
 SELECT * FROM Productos WHERE activo = 1;
 
@@ -20,9 +23,12 @@ SELECT p.* FROM Productos p
 JOIN ProductosLocales pl ON p.id = pl.producto_id
 WHERE pl.local_id = 1 AND p.activo = 1;
 
+-- =====================
+-- CONSULTAS MULTITABLA
+-- =====================
 -- 7. Listar productos sin movimientos recientes
 SELECT p.* FROM Productos p
-LEFT JOIN Movimientos m ON p.id = m.producto_id AND m.fecha > DATE_SUB(NOW(), INTERVAL 30 DAY)
+LEFT JOIN Movimientos m ON p.id = m.producto_id AND m.fecha > DATEADD(DAY, -30, GETDATE())
 WHERE m.id IS NULL AND p.activo = 1;
 
 -- 8. Listar productos más vendidos
@@ -60,7 +66,7 @@ SELECT p.id, p.nombre, MONTH(v.fecha) AS mes, SUM(vp.cantidad) AS ventas_mes
 FROM Productos p
 JOIN VentasProductos vp ON p.id = vp.producto_id
 JOIN Ventas v ON vp.venta_id = v.id
-GROUP BY p.id, p.nombre, mes;
+GROUP BY p.id, p.nombre, MONTH(v.fecha);
 
 -- 14. Listar productos y stock por local
 SELECT p.id, p.nombre, pl.local_id, l.nombre AS local, pl.stock

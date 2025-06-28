@@ -1,5 +1,8 @@
 -- Consultas simples y multitabla para Ventas
 
+-- =====================
+-- CONSULTAS SENCILLAS
+-- =====================
 -- 1. Listar todas las ventas
 SELECT * FROM Ventas;
 
@@ -7,7 +10,7 @@ SELECT * FROM Ventas;
 SELECT * FROM Ventas WHERE local_id = 1;
 
 -- 3. Listar ventas por fecha
-SELECT * FROM Ventas WHERE DATE(fecha) = '2024-06-01';
+SELECT * FROM Ventas WHERE CAST(fecha AS DATE) = '2024-06-01';
 
 -- 4. Listar ventas por método de pago
 SELECT * FROM Ventas WHERE metodo_pago = 'Efectivo';
@@ -18,6 +21,9 @@ SELECT local_id, COUNT(*) AS total FROM Ventas GROUP BY local_id;
 -- 6. Sumar total vendido por local
 SELECT local_id, SUM(total) AS total_vendido FROM Ventas GROUP BY local_id;
 
+-- =====================
+-- CONSULTAS MULTITABLA
+-- =====================
 -- 7. Listar ventas y productos vendidos
 SELECT v.id, v.fecha, v.total, p.nombre AS producto, vp.cantidad
 FROM Ventas v
@@ -31,7 +37,7 @@ SELECT * FROM Ventas WHERE fecha BETWEEN '2024-01-01' AND '2024-12-31';
 SELECT metodo_pago, COUNT(*) AS cantidad FROM Ventas GROUP BY metodo_pago;
 
 -- 10. Listar ventas y total vendido por mes
-SELECT MONTH(fecha) AS mes, SUM(total) AS total_vendido FROM Ventas GROUP BY mes;
+SELECT MONTH(fecha) AS mes, SUM(total) AS total_vendido FROM Ventas GROUP BY MONTH(fecha);
 
 -- 11. Listar ventas y locales
 SELECT v.id, v.fecha, v.total, l.nombre AS local
